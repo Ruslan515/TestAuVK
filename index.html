@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+
+  <title>Document</title>
+  <style>
+    ul {
+      list-style: none;
+    }
+
+    li {
+      margin-bottom: 15px;
+
+    }
+
+    a {
+
+      text-decoration: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+
+    }
+
+    h4 {
+      margin: 0;
+
+    }
+
+    img {
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      margin-right: 20px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <!--
+    f7b9598d1844bcd8051cf79eb38b881844c97e629a853a52a1cee23b61447515992d4e839690b537430b6
+https://oauth.vk.com/authorize?client_id=5490057&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=friends&response_type=token&v=5.52
+
+https://oauth.vk.com/authorize?client_id=6983352&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=friends&response_type=token&v=5.52
+    https://oauth.vk.com/authorize?client_id=6983352&display=page&redirect_uri=&scope=friends&response_type=token&v=5.52
+
+
+  https://oauth.vk.com/authorize?client_id=6983352&display=page&redirect_uri=&scope=friends&response_type=token&v=5.52
+  https://oauth.vk.com/blank.html#access_token=f7b9598d1844bcd8051cf79eb38b881844c97e629a853a52a1cee23b61447515992d4e839690b537430b6&expires_in=86400&user_id=6902831
+
+-->
+
+
+  <!--
+  2я версия с Юлаевым Русланом
+
+Доступ с  VK JS Aut к друзьям 
+https://oauth.vk.com/authorize?client_id=6983966&display=page&redirect_uri=&scope=friends&response_type=token&v=5.52
+
+После нажатия разрешить
+https://oauth.vk.com/blank.html#access_token=9e015fbeb528251e1f7ac4ba99bc4f853b9200d26f9f20822ee3337c7c2f2ff8dc2cedceff89cce841f86&expires_in=86400&user_id=530484103
+
+access_token=9e015fbeb528251e1f7ac4ba99bc4f853b9200d26f9f20822ee3337c7c2f2ff8dc2cedceff89cce841f86
+
+Запрос на получение ID пользователя
+https://api.vk.com/method/users.get?user_id=210700286&v=5.52
+
+в моем случае
+https://api.vk.com/method/friends.search?count=5&access_token=9e015fbeb528251e1f7ac4ba99bc4f853b9200d26f9f20822ee3337c7c2f2ff8dc2cedceff89cce841f86&v=5.52
+-->
+
+ 
+<div class="text-center">
+  <a role="button" style="background-color: #000; width: 200px; height: 30px; font-size: 20px;  " href="https://oauth.vk.com/authorize?client_id=6983966&redirect_uri=&scope=friends&response_type=token&v=5.52 " class="btn col-sm-4 btn-outline-primary btn-lg" id="btn">Авторизоваться</a>
+</div>
+<h1>
+  Список друзей
+</h1>
+
+  <button id="load">
+    Показать друзей
+  </button>
+
+
+  <ul>
+
+  </ul>
+
+  <script src="node_modules/jquery/dist/jquery.min.js"></script>
+
+  <script>
+    
+    $('#load').on('click', loadFriends());
+
+    function getUrl(method, params) {
+      if (!method) throw new Error('Вы не указали метод');
+      params = params || {};
+      params['access_token'] = '9e015fbeb528251e1f7ac4ba99bc4f853b9200d26f9f20822ee3337c7c2f2ff8dc2cedceff89cce841f86';
+      return 'https://api.vk.com/method/' + method + '?' + $.param(params) + '&v=5.52';
+    }
+
+    function sendRequest(method, params, func) {
+      $.ajax({
+        url: getUrl(method, params),
+        method: 'GET',
+        dataType: 'JSONP',
+        success: func
+      });
+    }
+
+    function loadFriends() {
+      sendRequest('friends.search', {
+        count: 5,
+        fields: 'photo_100'
+      }, function (data) {
+        drawFriends(data.response.items);
+      });
+    }
+
+    function drawFriends(friends) {
+      var html = '';
+      for (var i = 1; i < friends.length; i++) {
+        var f = friends[i];
+
+        html +=
+          '<li>' +
+          '<a target = "_blank" href = "vk.com/id' + f.uid + '">' +
+          '<img src = "' + f.photo_100 + '" />' +
+          '<div>' +
+          +'<h4>' + f.first_name + ' ' + f.last_name + '</h4>' +
+          /*'<button>Написать</button>'*/
+
+          +
+          '</div>' +
+          '</a>' +
+          '</li';
+      }
+      $('ul').html(html);
+    }
+  </script>
+
+</body>
+
+</html>
